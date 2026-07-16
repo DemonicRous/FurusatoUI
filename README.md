@@ -27,3 +27,15 @@ Minecraft Forge 1.12.2.
 ```
 
 Готовый JAR создаётся в `build/libs`.
+
+## Запуск среды разработки
+
+Репозитории `FurusatoCore` и `FurusatoUI` должны находиться рядом. Команда
+
+```powershell
+.\gradlew.bat runClient
+```
+
+автоматически соберёт Furusato Core и скопирует основной JAR в `run/mods` перед
+запуском клиента. В обычной сборке Minecraft оба JAR необходимо положить в
+папку `mods` вручную.

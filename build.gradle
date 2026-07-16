@@ -29,6 +29,37 @@ minecraft {
     replaceIn 'FurusatoUI.java'
 }
 
+def furusatoCoreProject = file('../FurusatoCore')
+
+task buildFurusatoCore(type: GradleBuild) {
+    description = 'Builds the sibling FurusatoCore project for the development client.'
+    dir = furusatoCoreProject
+    tasks = ['build']
+
+    doFirst {
+        if (!new File(furusatoCoreProject, 'build.gradle').isFile()) {
+            throw new GradleException('FurusatoCore must be located next to FurusatoUI.')
+        }
+    }
+}
+
+task installFurusatoCore(type: Copy, dependsOn: buildFurusatoCore) {
+    description = 'Installs FurusatoCore into the development run/mods directory.'
+    from(new File(furusatoCoreProject, 'build/libs')) {
+        include 'FurusatoCore-*.jar'
+        exclude '*-sources.jar'
+    }
+    into file('run/mods')
+
+    doFirst {
+        delete fileTree('run/mods') {
+            include 'FurusatoCore-*.jar'
+        }
+    }
+}
+
+runClient.dependsOn installFurusatoCore
+
 processResources {
     inputs.property 'version', project.version
     inputs.property 'mcversion', mc_version
