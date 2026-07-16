@@ -9,7 +9,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 PANORAMA_SOURCE = ROOT / "art" / "furusato_panorama_equirectangular.png"
 PANORAMA_OUTPUT = ROOT / "src/main/resources/assets/minecraft/textures/gui/title/background"
-FACE_SIZE = 512
+FACE_SIZE = 1024
 
 
 def direction(face: int, u: float, v: float) -> tuple[float, float, float]:
