@@ -34,7 +34,7 @@ def furusatoCoreProject = file('../FurusatoCore')
 task buildFurusatoCore(type: GradleBuild) {
     description = 'Builds the sibling FurusatoCore project for the development client.'
     dir = furusatoCoreProject
-    tasks = ['build']
+    tasks = ['clean', 'build']
 
     doFirst {
         if (!new File(furusatoCoreProject, 'build.gradle').isFile()) {

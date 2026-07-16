@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.GuiWorldSelection;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.GuiModList;
+import org.lwjgl.input.Keyboard;
 
 /** First Furusato screen: a modernized title-menu layout on the vanilla panorama. */
 public final class FurusatoMainMenu extends GuiMainMenu {
@@ -20,6 +21,7 @@ public final class FurusatoMainMenu extends GuiMainMenu {
     private static final int QUIT = 4;
     private static final int LANGUAGE = 5;
     private static final int MODS = 6;
+    private int focusedButton;
 
     @Override
     public void initGui() {
@@ -44,10 +46,12 @@ public final class FurusatoMainMenu extends GuiMainMenu {
                 I18n.format("menu.quit")));
         buttonList.add(new FurusatoButton(LANGUAGE, left, top + gap * 4, buttonWidth, 20,
                 I18n.format("options.language")));
+        setFocusedButton(0);
     }
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
+        setFocusedButton(buttonList.indexOf(button));
         switch (button.id) {
             case SINGLEPLAYER:
                 mc.displayGuiScreen(new GuiWorldSelection(this));
@@ -69,6 +73,49 @@ public final class FurusatoMainMenu extends GuiMainMenu {
                 break;
             default:
                 super.actionPerformed(button);
+        }
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        if (keyCode == Keyboard.KEY_TAB || keyCode == Keyboard.KEY_DOWN
+                || keyCode == Keyboard.KEY_RIGHT) {
+            moveFocus(1);
+            return;
+        }
+        if (keyCode == Keyboard.KEY_UP || keyCode == Keyboard.KEY_LEFT) {
+            moveFocus(-1);
+            return;
+        }
+        if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER
+                || keyCode == Keyboard.KEY_SPACE) {
+            GuiButton button = buttonList.get(focusedButton);
+            if (button.enabled && button.visible) {
+                button.playPressSound(mc.getSoundHandler());
+                actionPerformed(button);
+            }
+            return;
+        }
+        super.keyTyped(typedChar, keyCode);
+    }
+
+    private void moveFocus(int direction) {
+        int next = focusedButton;
+        do {
+            next = (next + direction + buttonList.size()) % buttonList.size();
+        } while (!buttonList.get(next).enabled || !buttonList.get(next).visible);
+        setFocusedButton(next);
+    }
+
+    private void setFocusedButton(int index) {
+        if (index < 0 || index >= buttonList.size()) {
+            return;
+        }
+        focusedButton = index;
+        for (int i = 0; i < buttonList.size(); i++) {
+            if (buttonList.get(i) instanceof FurusatoButton) {
+                ((FurusatoButton) buttonList.get(i)).setFocused(i == focusedButton);
+            }
         }
     }
 
