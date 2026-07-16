@@ -10,11 +10,15 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiOptions;
 import net.minecraft.client.gui.GuiWorldSelection;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.GuiModList;
 import org.lwjgl.input.Keyboard;
 
 /** First Furusato screen: a modernized title-menu layout on the vanilla panorama. */
 public final class FurusatoMainMenu extends GuiMainMenu {
+    private static final ResourceLocation TITLE_LOGO =
+            new ResourceLocation(FurusatoUI.MOD_ID, "textures/gui/title/minecraft_java.png");
     private static final int SINGLEPLAYER = 1;
     private static final int MULTIPLAYER = 2;
     private static final int OPTIONS = 0;
@@ -29,9 +33,9 @@ public final class FurusatoMainMenu extends GuiMainMenu {
         super.initGui();
         buttonList.clear();
 
-        int buttonWidth = 204;
+        int buttonWidth = 200;
         int left = width / 2 - buttonWidth / 2;
-        int top = height / 4 + 48;
+        int top = Math.max(96, height / 2 + 8);
         int gap = 24;
 
         buttonList.add(new FurusatoButton(SINGLEPLAYER, left, top, buttonWidth, 20,
@@ -40,12 +44,11 @@ public final class FurusatoMainMenu extends GuiMainMenu {
                 I18n.format("menu.multiplayer")));
         buttonList.add(new FurusatoButton(MODS, left, top + gap * 2, buttonWidth, 20,
                 I18n.format("fml.menu.mods")));
-        buttonList.add(new FurusatoButton(OPTIONS, left, top + gap * 3, 99, 20,
+        buttonList.add(new FurusatoButton(LANGUAGE, left, top + gap * 3, 20, 20, "L"));
+        buttonList.add(new FurusatoButton(OPTIONS, left + 24, top + gap * 3, 108, 20,
                 I18n.format("menu.options")));
-        buttonList.add(new FurusatoButton(QUIT, left + 105, top + gap * 3, 99, 20,
+        buttonList.add(new FurusatoButton(QUIT, left + 136, top + gap * 3, 64, 20,
                 I18n.format("menu.quit")));
-        buttonList.add(new FurusatoButton(LANGUAGE, left, top + gap * 4, buttonWidth, 20,
-                I18n.format("options.language")));
         setFocusedButton(0);
     }
 
@@ -122,6 +125,21 @@ public final class FurusatoMainMenu extends GuiMainMenu {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
+        mc.getTextureManager().bindTexture(TITLE_LOGO);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableBlend();
+        int logoWidth = Math.min(270, width - 32);
+        int logoHeight = logoWidth * 222 / 1024;
+        drawModalRectWithCustomSizedTexture(
+                width / 2 - logoWidth / 2,
+                24,
+                0.0F,
+                0.0F,
+                logoWidth,
+                logoHeight,
+                1024.0F,
+                222.0F
+        );
         drawCenteredString(fontRenderer, "Furusato UI " + FurusatoUI.VERSION,
                 width / 2, height - 20, 0xFFBDBDBD);
     }

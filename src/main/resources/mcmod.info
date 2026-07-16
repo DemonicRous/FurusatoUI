@@ -8,7 +8,7 @@
     "authorList": ["${mod_author}"],
     "dependencies": [
       "required-after:forge@[14.23.5.2847,)",
-      "required-after:furusatocore@[0.2.0,)"
+      "required-after:furusatocore@[0.3.0,)"
     ]
   }
 ]

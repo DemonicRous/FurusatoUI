@@ -44,8 +44,7 @@ public class FurusatoButton extends GuiButton {
                 width - half, height);
 
         if (focused && enabled) {
-            int pulse = 150 + (int) (55 * Math.sin(System.currentTimeMillis() / 180.0));
-            int focusColor = (pulse << 24) | 0x00FFD36A;
+            int focusColor = 0xD8FFFFFF;
             Gui.drawRect(x, y, x + width, y + 1, focusColor);
             Gui.drawRect(x, y + height - 1, x + width, y + height, focusColor);
             Gui.drawRect(x, y, x + 1, y + height, focusColor);

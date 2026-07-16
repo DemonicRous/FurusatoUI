@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
         name = FurusatoUI.NAME,
         version = FurusatoUI.VERSION,
         acceptedMinecraftVersions = "[1.12.2]",
-        dependencies = "required-after:forge@[14.23.5.2847,);required-after:furusatocore@[0.2.0,)",
+        dependencies = "required-after:forge@[14.23.5.2847,);required-after:furusatocore@[0.3.0,)",
         clientSideOnly = true
 )
 public final class FurusatoUI {
