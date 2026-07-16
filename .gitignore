@@ -9,5 +9,7 @@ bin/
 *.ipr
 *.iws
 *.launch
+__pycache__/
+*.pyc
 .project
 .classpath
