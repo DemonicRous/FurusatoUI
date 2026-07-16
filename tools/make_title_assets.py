@@ -9,8 +9,6 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 PANORAMA_SOURCE = ROOT / "art" / "furusato_panorama_equirectangular.png"
 PANORAMA_OUTPUT = ROOT / "src/main/resources/assets/minecraft/textures/gui/title/background"
-LOGO = ROOT / "src/main/resources/assets/furusatoui/textures/gui/title/minecraft_java.png"
-VANILLA_LOGO_OVERRIDE = ROOT / "src/main/resources/assets/minecraft/textures/gui/title/minecraft.png"
 FACE_SIZE = 512
 
 
@@ -51,19 +49,5 @@ def build_panorama() -> None:
         output.save(PANORAMA_OUTPUT / f"panorama_{face}.png", optimize=True)
 
 
-def finish_logo() -> None:
-    logo = Image.open(LOGO).convert("RGBA")
-    alpha_box = logo.getchannel("A").getbbox()
-    if alpha_box is None:
-        raise RuntimeError("The generated logo has no visible pixels")
-    logo = logo.crop(alpha_box)
-    logo.thumbnail((1024, 256), Image.Resampling.LANCZOS)
-    logo.save(LOGO, optimize=True)
-
-    VANILLA_LOGO_OVERRIDE.parent.mkdir(parents=True, exist_ok=True)
-    Image.new("RGBA", (256, 256), (0, 0, 0, 0)).save(VANILLA_LOGO_OVERRIDE, optimize=True)
-
-
 if __name__ == "__main__":
     build_panorama()
-    finish_logo()

@@ -1,15 +1,20 @@
 package com.demonicrous.furusato.ui.client.gui.component;
 
+import com.demonicrous.furusato.ui.FurusatoUI;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
-/**
- * A polished Minecraft button using the standard widget texture, sounds and
- * interaction states, with an additional visible keyboard-focus state.
- */
+/** Minecraft's modern 3-pixel nine-slice button adapted to the 1.12.2 GUI API. */
 public class FurusatoButton extends GuiButton {
+    private static final ResourceLocation NORMAL = texture("button");
+    private static final ResourceLocation HIGHLIGHTED = texture("button_highlighted");
+    private static final ResourceLocation DISABLED = texture("button_disabled");
     private boolean focused;
 
     public FurusatoButton(int id, int x, int y, int width, int height, String text) {
@@ -20,44 +25,40 @@ public class FurusatoButton extends GuiButton {
         this.focused = focused;
     }
 
-    public boolean isFocused() {
-        return focused;
-    }
-
     @Override
     public void drawButton(Minecraft minecraft, int mouseX, int mouseY, float partialTicks) {
-        if (!visible) {
-            return;
-        }
-
+        if (!visible) return;
         hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-        int state = getHoverState(hovered || focused);
-        minecraft.getTextureManager().bindTexture(BUTTON_TEXTURES);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        ResourceLocation texture = !enabled ? DISABLED : hovered || focused ? HIGHLIGHTED : NORMAL;
+        minecraft.getTextureManager().bindTexture(texture);
+        GlStateManager.color(1, 1, 1, 1);
         GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        GlStateManager.blendFunc(770, 771);
+        drawThreeSlice(x, y, width, height);
+        int color = enabled ? 0xFFFFFFFF : 0xFFA0A0A0;
+        drawCenteredString(minecraft.fontRenderer, displayString,
+                x + width / 2, y + (height - 8) / 2, color);
+    }
 
-        int half = width / 2;
-        drawTexturedModalRect(x, y, 0, 46 + state * 20, half, height);
-        drawTexturedModalRect(x + half, y, 200 - (width - half), 46 + state * 20,
-                width - half, height);
+    private static ResourceLocation texture(String name) {
+        return new ResourceLocation(FurusatoUI.MOD_ID, "textures/gui/widget/" + name + ".png");
+    }
 
-        if (focused && enabled) {
-            int focusColor = 0xD8FFFFFF;
-            Gui.drawRect(x, y, x + width, y + 1, focusColor);
-            Gui.drawRect(x, y + height - 1, x + width, y + height, focusColor);
-            Gui.drawRect(x, y, x + 1, y + height, focusColor);
-            Gui.drawRect(x + width - 1, y, x + width, y + height, focusColor);
-        }
+    private static void drawThreeSlice(int x, int y, int width, int height) {
+        drawSlice(x, y, 3, height, 0, 3);
+        drawSlice(x + 3, y, width - 6, height, 3, 194);
+        drawSlice(x + width - 3, y, 3, height, 197, 3);
+    }
 
-        int textColor = !enabled ? 0xFFA0A0A0 : hovered || focused ? 0xFFFFFFA0 : 0xFFE0E0E0;
-        drawCenteredString(
-                minecraft.fontRenderer,
-                displayString,
-                x + width / 2,
-                y + (height - 8) / 2,
-                textColor
-        );
+    private static void drawSlice(int x, int y, int width, int height, int sourceX, int sourceWidth) {
+        double u0 = sourceX / 200.0D;
+        double u1 = (sourceX + sourceWidth) / 200.0D;
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.pos(x, y + height, 0).tex(u0, 1).endVertex();
+        buffer.pos(x + width, y + height, 0).tex(u1, 1).endVertex();
+        buffer.pos(x + width, y, 0).tex(u1, 0).endVertex();
+        buffer.pos(x, y, 0).tex(u0, 0).endVertex();
+        tessellator.draw();
     }
 }
